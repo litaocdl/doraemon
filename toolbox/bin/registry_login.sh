@@ -1,3 +1,7 @@
+#!/bin/bash
+
+## the token is exported in ~/.bashrc
+
 echo "login docker"
 echo $CS_TOKEN | docker login docker.enterprisedb.com -u tao-li --password-stdin
 echo "login ghcr"
