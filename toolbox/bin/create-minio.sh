@@ -232,7 +232,12 @@ EOF
 }
 
 confirm() {
-  read -p "Confirm to create minio in namespace $namespace? (Y/N): " confirm
+  if [[ "$namespace" == "" ]]; then
+    read -p "Confirm to create minio in current namespace? (Y/N): " confirm
+  else 
+    read -p "Confirm to create minio in namespace "$namespace"? (Y/N): " confirm
+  fi
+  
   if [[ "$confirm" == [yY] || "$confirm" == [yY][eE][sS] ]]; then
     echo "checking minio under namespace before install"
     return 0 
@@ -260,22 +265,24 @@ parseArgs() {
         echo "Unknown option $1"
         exit 1
         ;;
+      *)
+        shift # past argument
+        ;;
     esac
   done
 }
 
 main(){
-  namespace=
   option=
+  namespace=
   secretsOnly=false
   displayHelp=false
-
   parseArgs $@
 
   if [[ $displayHelp == true ]]; then
     usage
   fi
-  
+
   confirm
   
   if [[ "$namespace" != "" ]]; then

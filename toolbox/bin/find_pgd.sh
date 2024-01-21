@@ -6,12 +6,16 @@ set -eEuo pipefail
 # This tools is uesd for looking for the pdggroup in all dps
 # need login first
 dps=$(tsh kube ls | grep  "dp" | cut -f1 -d" ")
+find=pgdgroup
+if $1 == "cnp";then
+  find=cluster
+fi
 
 for dp in $dps
 do
   echo "tsh kube login $dp$ \n"
   tsh kube login $dp
-  result=$(kubectl get pgdgroup -A)
+  result=$(kubectl get $find -A)
   if [[ $result != "" ]];then
     echo "find\n"
     echo $dp
