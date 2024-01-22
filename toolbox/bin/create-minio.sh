@@ -133,7 +133,7 @@ spec:
   - name: mc
     env:
     - name: MC_HOST_minio
-      value: "http://minio:minio123@$MINIO_SERVICE_NAME:9000"
+      value: "http://$(echo $MINIO_USERNAME | base64 -d):$(echo $MINIO_PASSWORD | base64 -d)@$MINIO_SERVICE_NAME:9000"
     - name: MC_URL
       value: "http://$MINIO_SERVICE_NAME:9000"
     command: ["sleep","3600"]
@@ -154,7 +154,7 @@ createMinio() {
     echo ""
     echo "******************************************************************"
     echo "Minio is deployed successfully in namespace \"$namespace\""
-     echo ""
+    echo ""
     echo "Minio can be access through http://minio-service.<namespace>:9000"
     echo ""
     echo "username is `echo $MINIO_USERNAME | base64 -d`"
@@ -233,12 +233,11 @@ EOF
 
 confirm() {
   if [[ "$namespace" == "" ]]; then
-    read -p "Confirm to create minio in current namespace? (Y/N): " confirm
+    read -p "Confirm to create minio in current namespace? (y/N): " confirm
   else 
-    read -p "Confirm to create minio in namespace "$namespace"? (Y/N): " confirm
+    read -p "Confirm to create minio in namespace "$namespace"? (y/N): " confirm
   fi
-  
-  if [[ "$confirm" == [yY] || "$confirm" == [yY][eE][sS] ]]; then
+  if [[ -z "$confirm" ]] || [[ "$confirm" =~ ^[yY]|[yY][eE][sS]$ ]]; then
     echo "checking minio under namespace before install"
     return 0 
   else
