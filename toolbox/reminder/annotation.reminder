@@ -1,0 +1,19 @@
+## This contains the annotations used for CNPG and PGD
+
+## `CNP`  (CNPG: cnpg.io)
+k8s.enterprisedb.io/coredumpFilter
+k8s.enterprisedb.io/reconciliationLoop=disabled
+# Add to cluster to fence a instance or cluster, json list
+k8s.enterprisedb.io/fencedInstances=["cluster-example-1","cluster-example-2`"]
+# add to cluster to hibernate a cluster 
+k8s.enterprisedb.io/hibernation=on
+# if set to enabled, will skip the empty wal archive check. 
+k8s.enterprisedb.io/skipEmptyWalArchiveCheck=enabled
+
+## `PGD`
+# Add to pgdgroup to hibernate the group
+k8s.pgd.enterprisedb.io/pause=on
+
+## `DPPGO`
+# add to PG4K cluster to stop reconcile the PG4K Cluster change
+k8s.dppgo.enterprisedb.io/reconciliationLoop=disabled

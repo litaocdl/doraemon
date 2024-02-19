@@ -1,0 +1,47 @@
+##### Popular go check tools
+
+# make go lang code style recommendation 
+golint
+golangci-lint run
+ignore: //nolint
+see doc: https://golangci-lint.run/usage/linters/
+
+# apply standard formating
+gofmt
+
+# finds subtle issues 
+go vet
+
+# find serious erros from code running 
+compiler
+
+##### File is not gofmt-ed with -s 
+ gofmt -s -w <>.go
+
+ gofumpt -w filename
+
+
+ ## upgrade ginkgo
+    go get github.com/onsi/ginkgo/v2/ginkgo/generators@v2.0.0
+    go get github.com/onsi/ginkgo/v2/ginkgo/internal@v2.0.0
+    go get github.com/onsi/ginkgo/v2/ginkgo/labels@v2.0.0
+    go install github.com/onsi/ginkgo/v2/ginkgo
+
+## go proxy in China
+go env -w GOPROXY=https://goproxy.cn,direct
+## go command
+go doc fmt
+go vet
+go build
+go install
+go mod tidy
+
+
+
+### update go mod
+Use go get xxxx@vxxx to update the go mod, if for private repository use this way
+ - go env -w GOPRIVATE=github.com/EnterpriseDB/cloud-native-postgresql 
+ - go get github.com/EnterpriseDB/cloud-native-postgresql@v1.13.0
+
+golangci-lint run --fix
+

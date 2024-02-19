@@ -7,7 +7,7 @@ set -eEuo pipefail
 # need login first
 dps=$(tsh kube ls | grep  "dp" | cut -f1 -d" ")
 find=pgdgroup
-if $1 == "cnp";then
+if [[ x"$1" == "xcnp" ]]; then
   find=cluster
 fi
 

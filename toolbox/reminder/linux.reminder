@@ -1,0 +1,36 @@
+# `command`
+find ./ -type f -name "*.yml" | xargs grep "github-status-action"
+
+## create file in script
+#################################### 
+cat <<EOF > cluster-example.yaml
+apiVersion: postgresql.k8s.enterprisedb.io/v1
+kind: Cluster
+metadata:
+  name: cluster-example
+spec:
+  instances: 3
+  primaryUpdateStrategy: unsupervised
+  storage:
+    size: 1Gi
+EOF
+####################################
+## pbcopy pbpaste
+echo "hello" | pbcopy
+
+
+`tools`
+### security scan
+trivy image quay.io/enterprisedb/edb-postgres-advanced:14.4.0-3 --security-checks vuln
+
+`jq`
+## convert the value of ts to human readable. like {"level":"info","ts":"2023-03-28T12:56:41Z"}
+cat xx |  jq '.ts |= (strptime("%Y-%m-%dT%H:%M:%SZ") | strftime("%Y-%m-%d %H:%M:%S"))'
+
+
+## `git`  
+##  gh cli view pr
+gh pr view --json number
+## modify recent commit message, need push directly, not merge
+git commit --amend --allow-empty
+git push main:main --force-with-lease

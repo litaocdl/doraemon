@@ -1,0 +1,85 @@
+`k8s`
+## port forwarding 
+k port-forward service/xxx|pod <localport>:<clusterpord>
+
+# auth
+kubectl auth can-i get pods --subresource=log
+# Check to see if I can access the URL /logs/
+kubectl auth can-i get /logs/
+# List all allowed actions in namespace "foo"
+kubectl auth can-i --list --namespace=foo
+
+## NoSchedule, NoExecute, PreferNoSchedule
+k taint nodes node1 k=v:NoSchedule
+
+## scale
+k scale deployment/postgresql-operator-controller-manager --replicas 2
+k scale cluster/cluster-besteffort --replicas 1
+
+
+#### call api directly.  k get --raw=/apis/<version>/<name>
+k get --raw=/apis/apps/v1/deployments
+k get --raw=/apis/postgresql.k8s.enterprisedb.io/v1/clusters
+
+
+### check resource under terminating ns
+ kubectl api-resources --verbs=list --namespaced -o name \
+  | xargs -n 1 kubectl get --show-kind --ignore-not-found -n scale-test
+
+
+### Patch object 
+ kubectl patch po cluster-guaranteed-1 --patch-file toleration_patch.yaml
+ kubectl patch po cluster-guaranteed-1 --patch-file <<END
+ spec:
+  tolerations:
+  - effect: NoExecute
+    key: node.kubernetes.io/memory-pressure
+    operator: "Exists"
+END
+
+k patch pod cluster-guaranteed-1 --type json -p '[{"op": "add", "path": "spec/tolerations", "value": {"effect":"NoExecute","key":"node.kubernetes.io/memory-pressure","operator":"Exists"} }]'
+k patch pod cluster-guaranteed-1 --type json -p '[{"op": "remove", "path": "spec/tolerations", "value": {"effect":"NoExecute","key":"node.kubernetes.io/memory-pressure","operator":"Exists"} }]'
+
+### load resource into kind 
+docker pull quay.io/enterprisedb/harp:2.0.2
+kind load docker-image quay.io/enterprisedb/harp:2.0.2 --name pg-operator-e2e-v1-23-1
+
+## get all resources
+kubectl api-resources --verbs=list --namespaced -o name | xargs -n 1 kubectl get --show-kind --ignore-not-found -n postgresql-operator-system
+
+## generate template
+k create clusterrole test --verb=list,get --resource=pod --dry-run=client -o yaml
+kubectl run busybox --image=busybox --dry-run=client -o yaml --restart=Never > yamlfile.yaml
+kubectl run busybox --image=busybox --dry-run=client -o yaml --restart=Never -- /bin/sh -c "while true; do echo hello; echo hello again;done" > yamlfile.yaml
+
+### copy secrets from one ns to another
+kubectl get secret client-ca-key-pair --namespace=default -o yaml | sed 's/namespace: .*/namespace: pgdgroup/' | kubectl apply -f -
+## decode all in secrets
+k -n cnp get secrets cluster-example-app -o json | jq '.data | values[] | @base64d'
+
+## print all logs into one from deployment
+k -n postgresql-operator-system logs -f deployment/postgresql-operator-controller-manager --all-containers=true
+
+## create a configmap for epas
+license=xxx
+image=quay.io/enterprisedb/edb-postgres-advanced:14.2.1
+k  -n postgresql-operator-system create configmap postgresql-operator-controller-manager-config --from-literal=EDB_LICENSE_KEY=$license --from-literal=POSTGRES_IMAGE_NAME=$image
+
+
+# `openshift`
+## Auth 
+oc policy who-can VERB RESOURCE
+
+#`docker`
+## remove all dangling files
+docker rmi $(docker images -f "dangling=true" -q)
+
+`aks`
+`eks`
+`gke`
+
+# `template`
+## network trouble shooting https://github.com/nicolaka/netshoot
+k run netshoot --image=nicolaka/netshoot -it --rm
+### ubi
+docker run -ti registry.access.redhat.com/ubi8/ubi:8.6-855 bash

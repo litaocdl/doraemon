@@ -1,0 +1,104 @@
+# `CNP`
+## hack script 
+hack/setup-cluster.sh -r -k v1.20.7 create load deploy
+## reload operator deployment
+kubectl rollout restart deployment \
+    -n postgresql-operator-system \
+    postgresql-operator-controller-manager
+
+## psql
+k  exec -it cluster-basic-1 -c postgres \ 
+    -- psql -tAc  'SELECT 1' \
+    'host=xxx dbname=app user=app password=xxx sslmode=require'
+
+k exec -it xxx -- psql -h cluster-example-recovery-rw -U app -d app -W
+## scale cluster
+k scale clusters xxx --replicas=5
+## export metrics 
+k port-forward pod/xxx 9187:9187
+
+## use custom-columnes
+k get cluster xxx -o custom-columns='type:.status.conditions[2].type,msg:.status.conditions[2].message,status:.status.conditions[2].status'
+
+## check if cnp restart time
+kubectl exec -it xxx -c postgres -- psql -tAc  'SELECT pg_postmaster_start_time()'
+
+
+# `BDR`
+## install bdr operator 
+1. $CNP/hack/setup-cluster.sh -r destroy create
+2. $CNP/hack/setup-cluster.sh -r deploy
+3. bdr5
+4. load images 
+hack/load-image.sh -d 14
+5. hack/deploy.sh
+6. kubectl create ns test; kubectl -n test apply -f $BDR5/docs/samples/flexible_3regions.yaml
+
+## Install otel 
+$ helm repo add open-telemetry https://open-telemetry.github.io/opentelemetry-helm-charts
+helm search repo open-telemetry
+> helm upgrade --install otel open-telemetry/opentelemetry-collector \
+> --create-namespace \
+> --namespace otel \
+> --wait \
+> --set mode=deployment \
+> --set image.tag=0.66.0
+
+helm uninstall otel
+
+
+## `psql`
+psql -h localhost -p 5432 -U postgres runoobdb
+
+##### psql 
+## list database
+\l \dt
+## connect to a db. psql -d postgres
+\c postgres
+psql -tAc "SET max_parallel_workers_per_gather to 1000"
+
+
+## pgbench
+# -s scaling, 50 times bigger
+pgbench -i -s 50 postgres
+pgbench -c 50 -T 60 postgres 
+
+pgbench -c 50 -h cluster-qos-rw -p 5432 -U postgres -j 4 -P 6 -T 300 postgres
+
+## makesure each table has rows
+SET max_parallel_workers_per_gather to 1000
+SELECT 1 FROM pgbench_accounts, pgbench_tellers, pgbench_branches, pgbench_history
+
+
+
+## pg functions 
+#check if pg is in recovery mode
+select pg_is_in_recovery()
+
+# create a table with several values
+CREATE TABLE test_replica AS VALUES (1), (2);
+
+## trigger war
+select TO_CHAR(CURRENT_TIMESTAMP,'YYYY-MM-DD HH24:MI:SS');
+psql -U postgres app -tAc 'CHECKPOINT; SELECT pg_walfile_name(pg_switch_wal())'
+## use connection string must quoto
+psql "user=app host=127.10.0.1 port=5432 password=xxx"  -tAc "select 1"
+
+ k -n cnpg exec -it cluster-example-with-roles-1 -- psql "user=vicii password= host=127.0.0.1 dbname=app"  -tAc "select 1"
+
+
+ `pg`
+# check if pg has pending restart 
+k exec -it postgresql-storage-class-1 -c postgres -- psql -tAc  "SELECT EXISTS(SELECT 1 FROM pg_settings WHERE pending_restart)" ; \
+
+## various way to execute statements
+k exec -it postgresql-storage-class-1 -c postgres -- psql -tAc  \
+ "show max_connections" ; \
+ 'host=cluster-qos-rw.test2.svc dbname=app user=postgres password=xxx sslmode=require'
+
+## dg command - get current lsn
+ psql -tAc "SELECT pg_current_wal_lsn()";
+## dg command - get the replay lsn of a standby
+psql -tAc "SELECT replay_lsn FROM pg_stat_replication WHERE application_name = 'failover-delay-3'";
+## dg command - teminate wal sender in primary 
+psql -tAc "SELECT pg_terminate_backend(80) FROM pg_stat_replication WHERE application_name = 'failover-delay-2'"

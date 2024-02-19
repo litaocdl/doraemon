@@ -1,0 +1,37 @@
+
+`upm`
+############ upm env ###########################
+dev:     tpmanage-ha.enterprisedb.network:443 
+staging: tpmanage-ha.staging.enterprisedb.network:443
+prod:    tpmanage-ha.biganimal.com:443
+###############################################
+## Login dev / stagin 
+tsh login --proxy=tpmanage-ha.enterprisedb.network:443  --auth=github
+tsh kube ls
+tsh kube login xxx
+
+## Login vCluster
+tsh login --proxy=tpmanage-ha-${domain}.ntzmyza.enterprisedb.network:443 --auth=aad-edbpostgres 
+
+## `aks`
+az login
+# az ad, azure active directory 
+az ad signed-in-user show
+# service principal list
+az ad sp list 
+# storage account
+az storage account list -g <resource group>
+#resource group
+az group list
+az group exists -n <group name>
+
+## Get the cluster credentials into local context after login 
+az aks get-credentials --resource-group tao-test-cs_group --name tao-test-cs
+
+
+
+
+
+
+
+
