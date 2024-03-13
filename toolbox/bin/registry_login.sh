@@ -8,3 +8,4 @@ echo "login ghcr"
 echo $CR_TOKEN | docker login https://ghcr.io/v2 -u litaocdl --password-stdin
 echo "login quay"
 echo $QUAY_TOKEN |  docker login quay.io -u tao_li --password-stdin
+echo "login cs"

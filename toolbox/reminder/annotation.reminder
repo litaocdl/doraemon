@@ -15,5 +15,5 @@ k8s.enterprisedb.io/skipEmptyWalArchiveCheck=enabled
 k8s.pgd.enterprisedb.io/pause=on
 
 ## `DPPGO`
-# add to PG4K cluster to stop reconcile the PG4K Cluster change
+# add to dppgopgdgroup to stop reconcile the PG4K Cluster change
 k8s.dppgo.enterprisedb.io/reconciliationLoop=disabled

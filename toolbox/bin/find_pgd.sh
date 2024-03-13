@@ -11,13 +11,21 @@ if [[ x"$1" == "xcnp" ]]; then
   find=cluster
 fi
 
+skip=
+if [[ x"$2" != "x" ]]; then
+  skip=$2
+fi
 for dp in $dps
 do
-  echo "tsh kube login $dp$ \n"
+  echo "tsh kube login $dp"
+  if [[ $dp == $skip ]]; then 
+       echo "skip $dp"
+       continue
+  fi
   tsh kube login $dp
   result=$(kubectl get $find -A)
-  if [[ $result != "" ]];then
-    echo "find\n"
+  if [[ $result != "" ]]; then
+    echo "find"
     echo $dp
     exit 0
   fi

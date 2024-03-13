@@ -252,6 +252,10 @@ parseArgs() {
         shift 
         shift
         ;;
+      -c|client-only)
+        clientOnly=true
+        shift
+        ;;
       -s|secrets-only)
         secretsOnly=true
         shift 
@@ -292,6 +296,11 @@ main(){
     createMinioSecrets
     exit 0
   fi
+  if [[ $clientOnly == true ]]; then
+    createMinioClient
+    exit 0
+  fi
+
   checkMinio
   createMinioPVC 
   createMinioSecrets 
