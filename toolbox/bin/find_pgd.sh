@@ -11,17 +11,29 @@ if [[ x"$1" == "xcnp" ]]; then
   find=cluster
 fi
 
-skip=
-if [[ x"$2" != "x" ]]; then
-  skip=$2
+## as we set -u, need check $#
+startWith=
+if [[ $# -gt 1 && x"$2" != "x" ]]; then
+  startWith=$2
 fi
+skip=false
 for dp in $dps
 do
-  echo "tsh kube login $dp"
-  if [[ $dp == $skip ]]; then 
-       echo "skip $dp"
-       continue
+  if [[ x"$skip" != "xtrue" && x"$startWith" != "x" ]]; then
+    if [[ $dp != $startWith ]]; then
+      echo "skip $dp"
+      skip=next
+      continue
+    fi
   fi
+
+  if [[ x"$skip" == "xnext" ]]; then
+    echo "skip $dp"
+    skip=true
+    continue
+  fi
+
+  echo "tsh kube login $dp"
   tsh kube login $dp
   result=$(kubectl get $find -A)
   if [[ $result != "" ]]; then

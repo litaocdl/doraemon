@@ -280,6 +280,7 @@ main(){
   namespace=
   secretsOnly=false
   displayHelp=false
+  clientOnly=false
   parseArgs $@
 
   if [[ $displayHelp == true ]]; then
